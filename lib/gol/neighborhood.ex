@@ -2,7 +2,15 @@ defmodule GOL.Neighborhood do
   use GenServer
   
   def start_link(position, opts \\ []) do
-    GenServer.start_link(__MODULE__, {position}, opts)
+    GenServer.start_link(
+      __MODULE__,
+      %{
+        :position => position,
+        :center => nil,
+        :alive_neighbors => 0
+      },
+      opts
+    )
   end
 
   def one_cell_is_alive(neighborhood, position) do
@@ -13,12 +21,18 @@ defmodule GOL.Neighborhood do
     GenServer.call(neighborhood, {:to_new_cell, target})
   end
 
-  def handle_call({:one_cell_is_alive, p}, _from, {position}) do
-    {:reply, nil, {position}}
+  def handle_call({:one_cell_is_alive, p}, _from, state) do
+    {:reply, nil, Map.update!(state, :alive_neighbors, fn number ->
+      number + 1
+    end)}
   end
 
-  def handle_call({:to_new_cell, target}, _from, {position}) do
-    target.(position, :dead)
-    {:reply, nil, {position}}
+  def handle_call({:to_new_cell, target}, _from, state) do
+    if state.alive_neighbors >= 4 do
+      target.(state.position, :alive)
+    else
+      target.(state.position, :dead)
+    end
+    {:reply, nil, state}
   end
 end
