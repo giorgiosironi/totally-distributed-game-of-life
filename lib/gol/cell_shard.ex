@@ -2,10 +2,11 @@ defmodule GOL.CellShard do
   use GenServer
   alias GOL.Cell
 
-  def start_link(generation, shard_index, args \\ []) do
+  def start_link(cell_events, generation, shard_index, args \\ []) do
     GenServer.start_link(
       __MODULE__, 
       %{
+        :cell_events => cell_events,
         :generation => generation,
         :shard_index => shard_index,
         :cells => []
