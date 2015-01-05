@@ -1,5 +1,6 @@
 defmodule GOL.NeighborhoodShard do
   use GenServer
+  alias GOL.ShardIndex
 
   def start_link(neighborhood_events, generation, shard_index, opts \\ []) do
     GenServer.start_link(
@@ -7,7 +8,9 @@ defmodule GOL.NeighborhoodShard do
       %{
         neighborhood_events: neighborhood_events,
         generation: generation,
-        shard_index: shard_index
+        shard_index: shard_index,
+        totals_neighborhoods: [],
+        neighborhoods: []
       },
       opts
     )
@@ -22,10 +25,18 @@ defmodule GOL.NeighborhoodShard do
   end
 
   def handle_call({:number_will_be, number}, _from, state) do
-    {:reply, nil, state}
+    {:reply, nil, Map.update!(state, :totals_neighborhoods, fn totals ->
+      totals ++ [number]
+    end)}
   end
 
   def handle_call({:needed_in, position}, _from, state) do
+    {:reply, nil, Map.update!(state, :neighborhoods, fn neighborhoods ->
+      neighborhoods ++ [position]
+      #n = Neighborhood.start_link position
+      #n.one_neighbor_is_alive
+      #neighborhoods ++ [n]
+    end)}
     {:reply, nil, state}
   end
 end
