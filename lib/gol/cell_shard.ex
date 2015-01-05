@@ -23,6 +23,11 @@ defmodule GOL.CellShard do
     GenServer.call(shard, {:alive})
   end
 
+  # TODO: docblocks
+  def evolve(shard) do
+    GenServer.call(shard, {:evolve})
+  end
+
   def init(state) do
     {:ok, state}
   end
@@ -42,5 +47,20 @@ defmodule GOL.CellShard do
       Cell.position c
     end
     {:reply, positions, state}
+  end
+
+  def handle_call({:evolve}, _from, state) do
+    current_shard_neighborhood_needed = for c <- state.cells do
+      Cell.neighborhood_needed_number c, state.shard_index
+    end
+    IO.inspect(current_shard_neighborhood_needed)
+    GenEvent.sync_notify state.cell_events, {
+      :neighborhood_needed_number,
+      state.shard_index,
+      Enum.reduce(current_shard_neighborhood_needed, fn elem, total ->
+        total + elem
+      end)
+    }
+    {:reply, nil, state}
   end
 end

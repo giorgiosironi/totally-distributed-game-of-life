@@ -27,8 +27,10 @@ defmodule GOL.CellShardTest do
   end
 
   test "tells all cells to evolve", %{manager: manager} do
-    {:ok, shard} = CellShard.start_link manager, 1, ShardIndex.from "0in4"
+    own_shard_index = ShardIndex.from "0in4"
+    {:ok, shard} = CellShard.start_link manager, 1, own_shard_index
     CellShard.add_alive_cell shard, Position.xy(5, 6)
-    #CellShard.evolve shard
+    CellShard.evolve shard
+    assert_receive {:neighborhood_needed_number, own_shard_index, 3}
   end
 end
