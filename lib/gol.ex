@@ -1,0 +1,2 @@
+defmodule GOL do
+end
