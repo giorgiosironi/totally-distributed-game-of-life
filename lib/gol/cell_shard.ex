@@ -33,6 +33,10 @@ defmodule GOL.CellShard do
     {:ok, state}
   end
 
+  def attach_event_handler(shard, handler, handler_state) do
+    GenServer.call(shard, {:attach_event_handler, handler, handler_state})
+  end
+
   def handle_call({:add_alive_cell, position}, _from, state) do
     {:ok, cell} = Cell.start_link position
     {:reply,
@@ -79,6 +83,11 @@ defmodule GOL.CellShard do
         end)
       end
     )
+    {:reply, nil, state}
+  end
+
+  def handle_call({:attach_event_handler, handler, handler_state}, _from, state) do
+    GenEvent.add_mon_handler(state.cell_events, handler, handler_state)
     {:reply, nil, state}
   end
 
