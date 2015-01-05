@@ -67,12 +67,13 @@ defmodule GOL.CellShard do
     )
     for_all_shards(state,
       fn shard_index ->
-        Enum.each(state.cells, fn c ->
-          Cell.neighborhoods c, fn center ->
+        Enum.each(state.cells, fn source ->
+          Cell.neighborhoods source, fn center, source ->
             emit_event(state, {
               :neighborhood_needed,
               shard_index,
-              center
+              center,
+              source
             })
           end
         end)

@@ -22,7 +22,6 @@ defmodule GOL.Neighborhood do
   end
 
   def handle_call({:one_cell_is_alive, position}, _from, state) do
-    IO.inspect(position)
     if position == state.position do
       {:reply, nil, Map.update!(state, :center, fn c -> :alive end)}
     else

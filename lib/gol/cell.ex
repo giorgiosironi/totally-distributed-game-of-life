@@ -22,7 +22,9 @@ defmodule GOL.Cell do
 
   def neighborhoods(cell, target) do
     Agent.get(cell, fn {position} ->
-      Enum.each(neighborhoods_centers(position), target)
+      Enum.each(neighborhoods_centers(position), fn center ->
+        target.(center, position)
+      end)
     end)
   end
 
