@@ -23,5 +23,39 @@ defmodule GOL.NeighborhoodTest do
     Neighborhood.to_new_cell neighborhood, fn center, life -> send parent, {center, life} end
     assert_receive {_, :alive}
   end
+
+  test "when has 2 alive neighbors and is alive will remain alive" do
+    own_center = Position.xy(1, 6)
+    {:ok, neighborhood} = Neighborhood.start_link own_center
+    Neighborhood.one_cell_is_alive neighborhood, own_center
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    parent = self()
+    Neighborhood.to_new_cell neighborhood, fn center, life -> send parent, {center, life} end
+    assert_receive {_, :alive}
+  end
+
+  test "when has 2 alive neighbors and is dead will remain dead" do
+    own_center = Position.xy(1, 6)
+    {:ok, neighborhood} = Neighborhood.start_link own_center
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    parent = self()
+    Neighborhood.to_new_cell neighborhood, fn center, life -> send parent, {center, life} end
+    assert_receive {_, :dead}
+  end
+
+  test "when has more than 3 alive neighbors will die of overcrowding" do
+    own_center = Position.xy(1, 6)
+    {:ok, neighborhood} = Neighborhood.start_link own_center
+    Neighborhood.one_cell_is_alive neighborhood, own_center
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    Neighborhood.one_cell_is_alive neighborhood, nil
+    parent = self()
+    Neighborhood.to_new_cell neighborhood, fn center, life -> send parent, {center, life} end
+    assert_receive {_, :dead}
+  end
 end
 
