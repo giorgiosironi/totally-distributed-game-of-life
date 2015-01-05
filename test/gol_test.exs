@@ -29,8 +29,16 @@ defmodule GOLTest do
           {shard_index, shard}
         )
       end
+      shard
     end
-    # try to make neighborhood shards emit events and look at them
+
+    for neighborhood_shard <- neighborhood_shards do
+      NeighborhoodShard.attach_event_handler(
+        neighborhood_shard,
+        ShardedNeighborhoodEventHandler,
+        {}
+      )
+    end
  
     CellShard.evolve hd(tl(cell_shards))
   end

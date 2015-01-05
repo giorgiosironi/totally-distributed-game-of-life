@@ -25,6 +25,10 @@ defmodule GOL.NeighborhoodShard do
     GenServer.call(shard, {:needed_in, position, source})
   end
 
+  def attach_event_handler(shard, handler, handler_state) do
+    GenServer.call(shard, {:attach_event_handler, handler, handler_state})
+  end
+
   def handle_call({:number_will_be, number}, _from, state) do
     state = Map.update!(state, :totals_neighborhoods, fn totals ->
       totals ++ [number]
@@ -46,6 +50,11 @@ defmodule GOL.NeighborhoodShard do
     end)
     state = Map.update!(state, :total_neighborhoods_needed_received, fn total -> total + 1 end)
     check_completion(state)
+    {:reply, nil, state}
+  end
+
+  def handle_call({:attach_event_handler, handler, handler_state}, _from, state) do
+    GenEvent.add_mon_handler(state.neighborhood_events, handler, handler_state)
     {:reply, nil, state}
   end
 
