@@ -51,21 +51,44 @@ defmodule GOL.CellShard do
   end
 
   def handle_call({:evolve}, _from, state) do
-    Enum.each(
-      ShardIndex.all(state.shard_index),
+    for_all_shards(state,
       fn shard_index ->
-        current_shard_neighborhood_needed = for c <- state.cells do
-          Cell.neighborhood_needed_number c, shard_index
-        end
-        GenEvent.sync_notify state.cell_events, {
+        emit_event(state, {
           :neighborhood_needed_number,
           shard_index,
-          Enum.reduce(current_shard_neighborhood_needed, fn elem, total ->
+          Enum.map(state.cells, fn c ->
+            Cell.neighborhood_needed_number c, shard_index
+          end) |>
+          Enum.reduce(fn elem, total ->
             total + elem
           end)
-        }
+        })
+      end
+    )
+    for_all_shards(state,
+      fn shard_index ->
+        Enum.each(state.cells, fn c ->
+          Cell.neighborhoods c, fn center ->
+            emit_event(state, {
+              :neighborhood_needed,
+              shard_index,
+              center
+            })
+          end
+        end)
       end
     )
     {:reply, nil, state}
+  end
+
+  defp for_all_shards(state, what_to_do) do
+    Enum.each(
+      ShardIndex.all(state.shard_index),
+      what_to_do
+    )
+  end
+
+  defp emit_event(state, event) do
+    GenEvent.sync_notify state.cell_events, event
   end
 end

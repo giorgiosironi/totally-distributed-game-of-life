@@ -35,5 +35,13 @@ defmodule GOL.CellShardTest do
 
     near_shard_index = ShardIndex.from "1in4"
     assert_receive {:neighborhood_needed_number, near_shard_index, 3}
+
+
+    existing_cell_position = Position.xy(0, 6)
+    assert_receive {:neighborhood_needed, own_shard_index, existing_cell_position}
+    side_cell_position = Position.xy(0, 7)
+    assert_receive {:neighborhood_needed, own_shard_index, side_cell_position}
+    near_shard_cell_position = Position.xy(1, 6)
+    assert_receive {:neighborhood_needed, near_shard_index, near_shard_cell_position}
   end
 end

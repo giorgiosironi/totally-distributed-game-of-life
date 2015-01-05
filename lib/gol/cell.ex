@@ -20,6 +20,12 @@ defmodule GOL.Cell do
     end)
   end
 
+  def neighborhoods(cell, target) do
+    Agent.get(cell, fn {position} ->
+      Enum.each(neighborhoods_centers(position), target)
+    end)
+  end
+
   defp neighborhoods_centers(position) do
     for x <- [position.x - 1, position.x, position.x + 1],
         y <- [position.y - 1, position.y, position.y + 1] do
