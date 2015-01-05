@@ -11,4 +11,10 @@ defmodule GOL.ShardIndex do
   def contains(index, number) do
     rem(number, index.total) == index.current
   end
+
+  def all(index) do
+    for i <- 0..index.total-1 do
+      %GOL.ShardIndex{current: i, total: index.total}
+    end
+  end
 end

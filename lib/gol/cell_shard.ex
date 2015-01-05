@@ -1,6 +1,7 @@
 defmodule GOL.CellShard do
   use GenServer
   alias GOL.Cell
+  alias GOL.ShardIndex
 
   def start_link(cell_events, generation, shard_index, args \\ []) do
     GenServer.start_link(
@@ -50,17 +51,21 @@ defmodule GOL.CellShard do
   end
 
   def handle_call({:evolve}, _from, state) do
-    current_shard_neighborhood_needed = for c <- state.cells do
-      Cell.neighborhood_needed_number c, state.shard_index
-    end
-    IO.inspect(current_shard_neighborhood_needed)
-    GenEvent.sync_notify state.cell_events, {
-      :neighborhood_needed_number,
-      state.shard_index,
-      Enum.reduce(current_shard_neighborhood_needed, fn elem, total ->
-        total + elem
-      end)
-    }
+    Enum.each(
+      ShardIndex.all(state.shard_index),
+      fn shard_index ->
+        current_shard_neighborhood_needed = for c <- state.cells do
+          Cell.neighborhood_needed_number c, shard_index
+        end
+        GenEvent.sync_notify state.cell_events, {
+          :neighborhood_needed_number,
+          shard_index,
+          Enum.reduce(current_shard_neighborhood_needed, fn elem, total ->
+            total + elem
+          end)
+        }
+      end
+    )
     {:reply, nil, state}
   end
 end

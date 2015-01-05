@@ -22,15 +22,18 @@ defmodule GOL.CellShardTest do
 
   test "knows a set of cells and their positions", %{manager: manager} do
     {:ok, shard} = CellShard.start_link manager, 1, ShardIndex.from "0in4"
-    CellShard.add_alive_cell shard, Position.xy(5, 6)
-    assert [Position.xy(5, 6)] == CellShard.alive shard
+    CellShard.add_alive_cell shard, Position.xy(0, 6)
+    assert [Position.xy(0, 6)] == CellShard.alive shard
   end
 
   test "tells all cells to evolve", %{manager: manager} do
     own_shard_index = ShardIndex.from "0in4"
     {:ok, shard} = CellShard.start_link manager, 1, own_shard_index
-    CellShard.add_alive_cell shard, Position.xy(5, 6)
+    CellShard.add_alive_cell shard, Position.xy(0, 6)
     CellShard.evolve shard
     assert_receive {:neighborhood_needed_number, own_shard_index, 3}
+
+    near_shard_index = ShardIndex.from "1in4"
+    assert_receive {:neighborhood_needed_number, near_shard_index, 3}
   end
 end

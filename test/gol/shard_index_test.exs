@@ -10,4 +10,15 @@ defmodule GOL.ShardIndexTest do
     assert false = ShardIndex.contains(index, 8)
     assert false = ShardIndex.contains(index, 9)
   end
+
+  test "can generate a list of all shards" do
+    index = ShardIndex.from "2in4"
+    all = [
+      ShardIndex.from("0in4"),
+      ShardIndex.from("1in4"),
+      ShardIndex.from("2in4"),
+      ShardIndex.from("3in4")
+    ] 
+    assert all = ShardIndex.all index
+  end
 end
