@@ -22,11 +22,20 @@ defmodule GOL.CellTest do
     assert 0 == Cell.neighborhood_needed_number cell, ShardIndex.from "3in4"
   end
 
-  test "iterates over its neighborhoods centers" do
+  test "iterates over its neighborhoods " do
     {:ok, cell} = Cell.start_link Position.xy(1, 1)
     parent = self()
     Cell.neighborhoods cell, fn center, source -> send parent, {center, source} end
     own_position = Position.xy(1, 1)
     assert_receive {own_position, own_position}
+  end
+
+  test "iterates over its neighborhoods for a particular shard" do
+    own_position = Position.xy(1, 1)
+    {:ok, cell} = Cell.start_link own_position
+    parent = self()
+    Cell.neighborhoods cell, ShardIndex.from("0in4"), fn center, source -> send parent, {center, source} end
+    correct_position = Position.xy(0, 1)
+    assert_receive {correct_position, own_position}
   end
 end
