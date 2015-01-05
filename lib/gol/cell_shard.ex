@@ -1,5 +1,6 @@
 defmodule GOL.CellShard do
   use GenServer
+  alias GOL.Cell
 
   def start_link(generation, shard_index, args \\ []) do
     GenServer.start_link(
@@ -26,11 +27,19 @@ defmodule GOL.CellShard do
   end
 
   def handle_call({:add_alive_cell, position}, _from, state) do
-    # TODO: create Cell Agent
-    {:reply, nil, Map.update!(state, :cells, fn list -> list ++ [position] end)}
+    {:ok, cell} = Cell.start_link position
+    {:reply,
+     nil,
+     Map.update!(state, :cells, fn list ->
+       list ++ [cell]
+     end)}
   end
 
   def handle_call({:alive}, _from, state) do
-    {:reply, state.cells, state}
+    # TODO: parallelize in some way
+    positions = for c <- state.cells do
+      Cell.position c
+    end
+    {:reply, positions, state}
   end
 end
