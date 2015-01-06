@@ -1,6 +1,7 @@
 defmodule GOLTest do
   use ExUnit.Case
   alias GOL.ShardedCellEventHandler
+  alias GOL.ShardedNeighborhoodEventHandler
   alias GOL.ShardIndex
   alias GOL.Position
   alias GOL.CellShard
@@ -35,11 +36,13 @@ defmodule GOLTest do
     for neighborhood_shard <- neighborhood_shards do
       NeighborhoodShard.attach_event_handler(
         neighborhood_shard,
-        ShardedNeighborhoodEventHandler,
+        {ShardedNeighborhoodEventHandler, make_ref()},
         {}
       )
     end
  
-    CellShard.evolve hd(tl(cell_shards))
+    for cell_shard <- cell_shards do
+      CellShard.evolve cell_shard
+    end
   end
 end
