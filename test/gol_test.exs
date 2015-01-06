@@ -6,18 +6,16 @@ defmodule GOLTest do
   alias GOL.Position
   alias GOL.CellShard
   alias GOL.NeighborhoodShard
+  alias GOL.Facade
 
   test "a bar rotates" do
-    cell_shards = for i <- 0..3 do
-      {:ok, manager} = GenEvent.start_link
-      {:ok, shard} = CellShard.start_link manager, 1, ShardIndex.from "#{i}in4"
-      shard
-    end
+    first_generation = Facade.empty_generation 4
+    cell_shards = Map.values(first_generation)
     # 2nd row
     # TODO: build a Facade to route the cell to the correct shard during initialization
-    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 0)
-    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 1)
-    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 2)
+    Facade.populate_alive_cell first_generation, Position.xy(1, 0)
+    Facade.populate_alive_cell first_generation, Position.xy(1, 1)
+    Facade.populate_alive_cell first_generation, Position.xy(1, 2)
 
     neighborhood_shards = for i <- 0..3 do
       {:ok, manager} = GenEvent.start_link

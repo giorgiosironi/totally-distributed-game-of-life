@@ -26,4 +26,13 @@ defmodule GOL.Facade do
       CellShard.alive shard
     end)
   end
+
+  def evolve(generation) do
+    GOL.Facade.each_shard generation, fn shard -> CellShard.evolve generation end
+  end
+
+  def each_shard(generation, target) do
+    Map.values(generation) |>
+    Enum.map(target)
+  end
 end
