@@ -7,7 +7,7 @@ defmodule GOLTest do
   alias GOL.NeighborhoodShard
 
   test "a bar rotates" do
-    cell_shards = for i <- 1..4 do
+    cell_shards = for i <- 0..3 do
       {:ok, manager} = GenEvent.start_link
       {:ok, shard} = CellShard.start_link manager, 1, ShardIndex.from "#{i}in4"
       shard
@@ -18,7 +18,7 @@ defmodule GOLTest do
     CellShard.add_alive_cell hd(tl(cell_shards)), Position.xy(1, 1)
     CellShard.add_alive_cell hd(tl(cell_shards)), Position.xy(1, 2)
 
-    neighborhood_shards = for i <- 1..4 do
+    neighborhood_shards = for i <- 0..3 do
       {:ok, manager} = GenEvent.start_link
       shard_index = ShardIndex.from "#{i}in4"
       {:ok, shard} = NeighborhoodShard.start_link manager, 2, shard_index

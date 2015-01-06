@@ -3,7 +3,6 @@ defmodule GOL.ShardedCellEventHandler do
   alias GOL.NeighborhoodShard
 
   def handle_event(event, {shard_index, neighborhood_shard} = state) do
-    IO.inspect(state)
     translate_to_command(event, shard_index, neighborhood_shard)
     {:ok, state}
   end

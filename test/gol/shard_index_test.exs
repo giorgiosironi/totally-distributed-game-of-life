@@ -11,6 +11,10 @@ defmodule GOL.ShardIndexTest do
     assert false = ShardIndex.contains(index, 9)
   end
 
+  test "index goes from 0 to the total number of shards, excluded" do
+    assert catch_error(ShardIndex.from "4in4") == {:badmatch, false}
+  end
+
   test "can generate a list of all shards" do
     index = ShardIndex.from "2in4"
     all = [

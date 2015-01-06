@@ -5,6 +5,8 @@ defmodule GOL.ShardIndex do
     [current_string, total_string] = String.split(representation, "in")
     {current, ""} = Integer.parse current_string
     {total, ""} = Integer.parse total_string
+    true = current < total
+    true = current >= 0
     %GOL.ShardIndex{current: current, total: total}
   end
 
