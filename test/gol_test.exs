@@ -25,7 +25,7 @@ defmodule GOLTest do
       for cell_shard <- cell_shards do
         CellShard.attach_event_handler(
           cell_shard,
-          ShardedCellEventHandler,
+          {ShardedCellEventHandler, make_ref()},
           {shard_index, shard}
         )
       end
