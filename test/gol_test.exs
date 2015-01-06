@@ -33,16 +33,24 @@ defmodule GOLTest do
       shard
     end
 
-    for neighborhood_shard <- neighborhood_shards do
+    second_generation_cell_shards = for related_neighborhood_shard <- neighborhood_shards do
+      {:ok, manager} = GenEvent.start_link
+      {:ok, cell_shard} = CellShard.start_link manager, 2, NeighborhoodShard.shard_index(related_neighborhood_shard)
       NeighborhoodShard.attach_event_handler(
-        neighborhood_shard,
+        related_neighborhood_shard,
         {ShardedNeighborhoodEventHandler, make_ref()},
-        {}
+        {cell_shard}
       )
+      cell_shard
     end
  
     for cell_shard <- cell_shards do
       CellShard.evolve cell_shard
+    end
+
+    # Inspect second_generation_cell_shards
+    for second_cell_shard <- second_generation_cell_shards do
+      IO.inspect CellShard.alive(second_cell_shard)
     end
   end
 end
