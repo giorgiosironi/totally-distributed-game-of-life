@@ -63,7 +63,7 @@ defmodule GOL.CellShard do
           Enum.map(state.cells, fn c ->
             Cell.neighborhood_needed_number c, shard_index
           end) |>
-          Enum.reduce(fn elem, total ->
+          Enum.reduce(0, fn elem, total ->
             total + elem
           end)
         })

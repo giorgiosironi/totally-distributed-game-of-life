@@ -44,4 +44,11 @@ defmodule GOL.CellShardTest do
     near_shard_cell_position = Position.xy(1, 6)
     assert_receive {:neighborhood_needed, near_shard_index, near_shard_cell_position, existing_cell_position}
   end
+
+  test "some cell shards may be empty", %{manager: manager} do
+    own_shard_index = ShardIndex.from "0in4"
+    {:ok, shard} = CellShard.start_link manager, 1, own_shard_index
+    CellShard.evolve shard
+    assert_receive {:neighborhood_needed_number, own_shard_index, 0}
+  end
 end
