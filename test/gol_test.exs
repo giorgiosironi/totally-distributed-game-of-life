@@ -31,22 +31,21 @@ defmodule GOLTest do
       shard
     end
 
-    second_generation_cell_shards = for related_neighborhood_shard <- neighborhood_shards do
+    second_generation = for related_neighborhood_shard <- neighborhood_shards, into: %{} do
       {:ok, manager} = GenEvent.start_link
-      {:ok, cell_shard} = CellShard.start_link manager, 2, NeighborhoodShard.shard_index(related_neighborhood_shard)
+      shard_index = NeighborhoodShard.shard_index(related_neighborhood_shard)
+      {:ok, cell_shard} = CellShard.start_link manager, 2, shard_index
       NeighborhoodShard.attach_event_handler(
         related_neighborhood_shard,
         {ShardedNeighborhoodEventHandler, make_ref()},
         {cell_shard}
       )
-      cell_shard
+      {shard_index, cell_shard}
     end
  
     Facade.evolve first_generation
 
-    # Inspect second_generation_cell_shards
-    for second_cell_shard <- second_generation_cell_shards do
-      IO.inspect CellShard.alive(second_cell_shard)
-    end
+    # Inspect second_generation
+    IO.inspect Facade.alive second_generation
   end
 end
