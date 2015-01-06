@@ -15,9 +15,9 @@ defmodule GOLTest do
     end
     # 2nd row
     # TODO: build a Facade to route the cell to the correct shard during initialization
-    CellShard.add_alive_cell hd(tl(cell_shards)), Position.xy(1, 0)
-    CellShard.add_alive_cell hd(tl(cell_shards)), Position.xy(1, 1)
-    CellShard.add_alive_cell hd(tl(cell_shards)), Position.xy(1, 2)
+    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 0)
+    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 1)
+    CellShard.populate_alive_cell hd(tl(cell_shards)), Position.xy(1, 2)
 
     neighborhood_shards = for i <- 0..3 do
       {:ok, manager} = GenEvent.start_link

@@ -16,8 +16,8 @@ defmodule GOL.CellShard do
     )
   end
 
-  def add_alive_cell(shard, position) do
-    GenServer.call(shard, {:add_alive_cell, position})
+  def populate_alive_cell(shard, position) do
+    GenServer.call(shard, {:populate_alive_cell, position})
   end
 
   def alive(shard) do
@@ -37,7 +37,7 @@ defmodule GOL.CellShard do
     GenServer.call(shard, {:attach_event_handler, handler, handler_state})
   end
 
-  def handle_call({:add_alive_cell, position}, _from, state) do
+  def handle_call({:populate_alive_cell, position}, _from, state) do
     {:ok, cell} = Cell.start_link position
     {:reply,
      nil,
