@@ -42,9 +42,7 @@ defmodule GOLTest do
       cell_shard
     end
  
-    for cell_shard <- cell_shards do
-      CellShard.evolve cell_shard
-    end
+    Facade.evolve first_generation
 
     # Inspect second_generation_cell_shards
     for second_cell_shard <- second_generation_cell_shards do

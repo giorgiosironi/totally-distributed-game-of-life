@@ -28,7 +28,7 @@ defmodule GOL.Facade do
   end
 
   def evolve(generation) do
-    GOL.Facade.each_shard generation, fn shard -> CellShard.evolve generation end
+    GOL.Facade.each_shard generation, fn shard -> CellShard.evolve shard end
   end
 
   def each_shard(generation, target) do
