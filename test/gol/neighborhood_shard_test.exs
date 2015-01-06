@@ -30,7 +30,7 @@ defmodule GOL.NeighborhoodShardTest do
 
     assert_receive {:cells_considered, own_shard, 1}
     populated_center = Position.xy 0, 1
-    assert_receive {:cell, own_shard, populated_center, :alive}
+    assert_receive {:cell, ^own_shard, ^populated_center, :alive}
 
   end
 end

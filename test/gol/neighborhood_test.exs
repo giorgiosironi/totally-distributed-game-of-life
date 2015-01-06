@@ -9,7 +9,7 @@ defmodule GOL.NeighborhoodTest do
     Neighborhood.one_cell_is_alive neighborhood, own_center
     parent = self()
     Neighborhood.to_new_cell neighborhood, fn center, life -> send parent, {center, life} end
-    assert_receive {own_center, :dead}
+    assert_receive {^own_center, :dead}
   end
 
   test "when has 3 alive neighbors will be alive" do

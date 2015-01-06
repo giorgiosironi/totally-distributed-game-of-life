@@ -36,6 +36,6 @@ defmodule GOL.CellTest do
     parent = self()
     Cell.neighborhoods cell, ShardIndex.from("0in4"), fn center, source -> send parent, {center, source} end
     correct_position = Position.xy(0, 1)
-    assert_receive {correct_position, own_position}
+    assert_receive {^correct_position, ^own_position}
   end
 end

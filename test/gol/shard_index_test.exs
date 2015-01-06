@@ -23,6 +23,6 @@ defmodule GOL.ShardIndexTest do
       ShardIndex.from("2in4"),
       ShardIndex.from("3in4")
     ] 
-    assert all = ShardIndex.all index
+    assert all == ShardIndex.all index
   end
 end
