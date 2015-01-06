@@ -26,6 +26,13 @@ defmodule GOL.CellShardTest do
     assert [Position.xy(0, 6)] == CellShard.alive shard
   end
 
+  test "adding alive cells is idempotent", %{manager: manager} do
+    {:ok, shard} = CellShard.start_link manager, 1, ShardIndex.from "0in4"
+    CellShard.populate_alive_cell shard, Position.xy(0, 6)
+    CellShard.populate_alive_cell shard, Position.xy(0, 6)
+    assert 1 == Enum.count CellShard.alive shard
+  end
+
   test "tells all cells to evolve", %{manager: manager} do
     own_shard_index = ShardIndex.from "0in4"
     {:ok, shard} = CellShard.start_link manager, 1, own_shard_index

@@ -10,7 +10,7 @@ defmodule GOL.CellShard do
         :cell_events => cell_events,
         :generation => generation,
         :shard_index => shard_index,
-        :cells => [],
+        :cells => %{},
         :registered_cells_current => 0,
         :registered_cells_expected => nil
       },
@@ -54,8 +54,9 @@ defmodule GOL.CellShard do
   end
 
   def handle_call({:alive}, _from, state) do
-    # TODO: parallelize in some way
-    positions = for c <- state.cells do
+    # TODO: parallelize in some way,
+    # just use Map.keys(state.cells) ?
+    positions = for c <- Map.values(state.cells) do
       Cell.position c
     end
     {:reply, positions, state}
@@ -67,7 +68,7 @@ defmodule GOL.CellShard do
         emit_event(state, {
           :neighborhood_needed_number,
           shard_index,
-          Enum.map(state.cells, fn c ->
+          Enum.map(Map.values(state.cells), fn c ->
             Cell.neighborhood_needed_number c, shard_index
           end) |>
           Enum.reduce(0, fn elem, total ->
@@ -78,7 +79,7 @@ defmodule GOL.CellShard do
     )
     for_all_shards(state,
       fn shard_index ->
-        Enum.each(state.cells, fn source ->
+        Enum.each(Map.values(state.cells), fn source ->
           Cell.neighborhoods source, shard_index, fn center, source ->
             emit_event(state, {
               :neighborhood_needed,
@@ -123,9 +124,12 @@ defmodule GOL.CellShard do
   end
 
   defp spawn_alive_cell(state, position) do
-    {:ok, cell} = Cell.start_link position
-    Map.update!(state, :cells, fn list ->
-      list ++ [cell]
+    Map.update!(state, :cells, fn by_position ->
+      if !Map.has_key? by_position, position do
+        {:ok, cell} = Cell.start_link position
+        by_position = Map.put by_position, position, cell
+      end
+      by_position
     end)
   end
 end
