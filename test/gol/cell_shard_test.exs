@@ -51,4 +51,15 @@ defmodule GOL.CellShardTest do
     CellShard.evolve shard
     assert_receive {:neighborhood_needed_number, own_shard_index, 0}
   end
+
+  test "registers an evolution", %{manager: manager} do
+    own_shard_index = ShardIndex.from "0in4"
+    {:ok, shard} = CellShard.start_link manager, 1, own_shard_index
+    CellShard.register_evolved_cell shard, Position.xy(0, 2), :alive
+    CellShard.register_evolved_cell shard, Position.xy(4, 5), :dead
+    CellShard.register_evolved_number shard, 2
+
+    assert [Position.xy(0, 2)] == CellShard.alive shard
+  end
 end
+

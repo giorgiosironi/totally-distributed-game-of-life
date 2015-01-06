@@ -10,7 +10,9 @@ defmodule GOL.CellShard do
         :cell_events => cell_events,
         :generation => generation,
         :shard_index => shard_index,
-        :cells => []
+        :cells => [],
+        :registered_cells_current => 0,
+        :registered_cells_expected => nil
       },
       args
     )
@@ -18,6 +20,14 @@ defmodule GOL.CellShard do
 
   def populate_alive_cell(shard, position) do
     GenServer.call(shard, {:populate_alive_cell, position})
+  end
+
+  def register_evolved_cell(shard, position, life) do
+    GenServer.call(shard, {:register_evolved_cell, position, life})
+  end
+
+  def register_evolved_number(shard, number) do
+    GenServer.call(shard, {:register_evolved_number, number})
   end
 
   def alive(shard) do
@@ -38,12 +48,9 @@ defmodule GOL.CellShard do
   end
 
   def handle_call({:populate_alive_cell, position}, _from, state) do
-    {:ok, cell} = Cell.start_link position
     {:reply,
      nil,
-     Map.update!(state, :cells, fn list ->
-       list ++ [cell]
-     end)}
+     spawn_alive_cell(state, position)}
   end
 
   def handle_call({:alive}, _from, state) do
@@ -91,6 +98,19 @@ defmodule GOL.CellShard do
     {:reply, nil, state}
   end
 
+  def handle_call({:register_evolved_cell, position, life}, _from, state) do
+    if life == :alive do
+      state = spawn_alive_cell(state, position)
+    end
+    state = Map.update!(state, :registered_cells_current, fn number -> number + 1 end)
+    {:reply, nil, state}
+  end
+
+  def handle_call({:register_evolved_number, number}, _from, state) do
+    state = Map.put(state, :registered_cells_number, number)
+    {:reply, nil, state}
+  end
+
   defp for_all_shards(state, what_to_do) do
     Enum.each(
       ShardIndex.all(state.shard_index),
@@ -100,5 +120,12 @@ defmodule GOL.CellShard do
 
   defp emit_event(state, event) do
     GenEvent.sync_notify state.cell_events, event
+  end
+
+  defp spawn_alive_cell(state, position) do
+    {:ok, cell} = Cell.start_link position
+    Map.update!(state, :cells, fn list ->
+      list ++ [cell]
+    end)
   end
 end
