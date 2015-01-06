@@ -10,10 +10,13 @@ defmodule GOLTest do
     Facade.populate_alive_cell first_generation, Position.xy(1, 2)
  
     second_generation = Facade.evolve first_generation
-
     assert [Position.xy(0, 1), 
             Position.xy(1, 1), 
             Position.xy(2, 1)] == Facade.alive second_generation
 
+    third_generation = Facade.evolve second_generation
+    assert [Position.xy(1, 0), 
+            Position.xy(1, 1), 
+            Position.xy(1, 2)] == Facade.alive third_generation
   end
 end
