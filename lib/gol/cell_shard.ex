@@ -1,4 +1,5 @@
 defmodule GOL.CellShard do
+  # TODO: this module is the largest one, extract or shorten it up
   use GenServer
   alias GOL.Cell
   alias GOL.ShardIndex
@@ -190,11 +191,7 @@ defmodule GOL.CellShard do
   end
 
   defp all_alive_cells_positions(state) do
-    # TODO: parallelize in some way,
-    # just use Map.keys(state.cells) ?
-    for c <- Map.values(state.cells) do
-      Cell.position c
-    end
+    Map.keys(state.cells)
   end
 
   defp is_alive(state, position) do
