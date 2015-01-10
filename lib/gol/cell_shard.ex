@@ -12,7 +12,8 @@ defmodule GOL.CellShard do
         :shard_index => shard_index,
         :cells => %{},
         :registered_cells_current => 0,
-        :registered_cells_expected => nil
+        :registered_cells_expected => nil,
+        :alive_calls_queue => []
       },
       args
     )
@@ -20,6 +21,10 @@ defmodule GOL.CellShard do
 
   def populate_alive_cell(shard, position) do
     GenServer.call(shard, {:populate_alive_cell, position})
+  end
+
+  def declare_empty(shard) do
+    GenServer.call(shard, {:declare_empty})
   end
 
   def register_evolved_cell(shard, position, life) do
@@ -54,16 +59,23 @@ defmodule GOL.CellShard do
   def handle_call({:populate_alive_cell, position}, _from, state) do
     {:reply,
      nil,
-     spawn_alive_cell(state, position)}
+     spawn_alive_cell(state, position) |>
+     count_all_cells_as_registered
+    }
   end
 
-  def handle_call({:alive}, _from, state) do
-    # TODO: parallelize in some way,
-    # just use Map.keys(state.cells) ?
-    positions = for c <- Map.values(state.cells) do
-      Cell.position c
+  def handle_call({:declare_empty}, _from, state) do
+    {:reply,
+     nil,
+     count_all_cells_as_registered state
+    }
+  end
+
+  def handle_call({:alive}, from, state) do
+    case registration_is_complete(state) do 
+      true -> {:reply, all_alive_cells_positions(state), state}
+      false -> {:noreply, Map.update!(state, :alive_calls_queue, fn queue -> [{from, :alive}|queue] end)} 
     end
-    {:reply, positions, state}
   end
 
   def handle_call({:alive, position}, _from, state) do
@@ -113,11 +125,17 @@ defmodule GOL.CellShard do
       state = spawn_alive_cell(state, position)
     end
     state = Map.update!(state, :registered_cells_current, fn number -> number + 1 end)
+    if registration_is_complete(state) do 
+      state = empty_alive_calls_queue(state)
+    end
     {:reply, nil, state}
   end
 
   def handle_call({:register_evolved_number, number}, _from, state) do
-    state = Map.put(state, :registered_cells_number, number)
+    state = Map.put(state, :registered_cells_expected, number)
+    if registration_is_complete(state) do 
+      state = empty_alive_calls_queue(state)
+    end
     {:reply, nil, state}
   end
 
@@ -140,5 +158,31 @@ defmodule GOL.CellShard do
       end
       by_position
     end)
+  end
+
+  defp registration_is_complete(state) do
+    state[:registered_cells_current] == state[:registered_cells_expected]
+  end
+
+  defp empty_alive_calls_queue(state) do
+    Enum.each(state[:alive_calls_queue], fn {from, :alive} ->
+      GenServer.reply from, all_alive_cells_positions(state)
+    end)
+    Map.put(state, :alive_calls_queue, [])
+  end
+
+  defp count_all_cells_as_registered(state) do
+    total = Enum.count state.cells
+    state |>
+    Map.put(:registered_cells_current, total) |>
+    Map.put(:registered_cells_expected, total)
+  end
+
+  defp all_alive_cells_positions(state) do
+    # TODO: parallelize in some way,
+    # just use Map.keys(state.cells) ?
+    positions = for c <- Map.values(state.cells) do
+      Cell.position c
+    end
   end
 end

@@ -14,6 +14,7 @@ defmodule GOL.Facade do
       {:ok, manager} = GenEvent.start_link
       shard_index = ShardIndex.from "#{i}in4"
       {:ok, shard} = CellShard.start_link manager, 1, shard_index
+      CellShard.declare_empty shard
       {shard_index, shard}
     end
   end
