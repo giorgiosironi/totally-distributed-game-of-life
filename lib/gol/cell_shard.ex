@@ -74,13 +74,19 @@ defmodule GOL.CellShard do
   def handle_call({:alive}, from, state) do
     case registration_is_complete(state) do 
       true -> {:reply, all_alive_cells_positions(state), state}
-      false -> {:noreply, Map.update!(state, :alive_calls_queue, fn queue -> [{from, :alive}|queue] end)} 
+      false -> {:noreply, enqueue_alive_call(state, {from, :alive})}
     end
   end
 
-  def handle_call({:alive, position}, _from, state) do
-    lifeness = Map.has_key? state.cells, position
-    {:reply, lifeness, state}
+  defp enqueue_alive_call(state, call) do
+    Map.update!(state, :alive_calls_queue, fn queue -> [call|queue] end) 
+  end
+
+  def handle_call({:alive, position}, from, state) do
+    case registration_is_complete(state) do 
+      true -> {:reply, is_alive(state, position), state}
+      false -> {:noreply, enqueue_alive_call(state, {from, :alive, position})}
+    end
   end
 
   def handle_call({:evolve}, _from, state) do
@@ -165,8 +171,9 @@ defmodule GOL.CellShard do
   end
 
   defp empty_alive_calls_queue(state) do
-    Enum.each(state[:alive_calls_queue], fn {from, :alive} ->
-      GenServer.reply from, all_alive_cells_positions(state)
+    Enum.each(state[:alive_calls_queue], fn 
+      {from, :alive} -> GenServer.reply from, all_alive_cells_positions(state)
+      {from, :alive, position} -> GenServer.reply from, is_alive(state, position)
     end)
     Map.put(state, :alive_calls_queue, [])
   end
@@ -184,5 +191,9 @@ defmodule GOL.CellShard do
     positions = for c <- Map.values(state.cells) do
       Cell.position c
     end
+  end
+
+  defp is_alive(state, position) do
+    Map.has_key? state.cells, position
   end
 end

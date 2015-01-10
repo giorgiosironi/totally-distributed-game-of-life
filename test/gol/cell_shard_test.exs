@@ -82,6 +82,7 @@ defmodule GOL.CellShardTest do
     CellShard.register_evolved_cell shard, Position.xy(0, 0), :alive
 
     spawn_link(fn -> assert [Position.xy(0, 0), Position.xy(0, 1)] == CellShard.alive shard end)
+    spawn_link(fn -> assert CellShard.alive shard, Position.xy(0, 1) end)
     # let the spawned assertion execute
     :timer.sleep 1
     
@@ -89,7 +90,7 @@ defmodule GOL.CellShardTest do
     CellShard.register_evolved_number shard, 2
   end
 
-  test "when declared emtpy can be consulted with alive calls", %{manager: manager} do
+  test "when declared empty can be consulted with alive calls", %{manager: manager} do
     own_shard_index = ShardIndex.from "0in4"
     {:ok, shard} = CellShard.start_link manager, 1, own_shard_index
     CellShard.declare_empty shard
