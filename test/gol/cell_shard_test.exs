@@ -3,15 +3,7 @@ defmodule GOL.CellShardTest do
   alias GOL.CellShard
   alias GOL.Position
   alias GOL.ShardIndex
-
-  defmodule Forwarder do
-    use GenEvent
-
-    def handle_event(event, parent) do
-      send parent, event
-      {:ok, parent}
-    end
-  end
+  alias GOL.Forwarder
 
   setup do
     {:ok, manager} = GenEvent.start_link

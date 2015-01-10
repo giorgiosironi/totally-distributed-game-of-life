@@ -3,17 +3,8 @@ defmodule GOL.NeighborhoodShardTest do
   alias GOL.NeighborhoodShard
   alias GOL.Position
   alias GOL.ShardIndex
+  alias GOL.Forwarder
 
-  # TODO: remove duplication between tests
-  defmodule Forwarder do
-    use GenEvent
-
-    def handle_event(event, parent) do
-      send parent, event
-      {:ok, parent}
-    end
-  end
-  
   test "after the number of relevant neighborhood needed is known it can tell them to evolve" do
     {:ok, manager} = GenEvent.start_link
     own_shard = ShardIndex.from "0in4"
