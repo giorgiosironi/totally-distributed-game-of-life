@@ -5,6 +5,10 @@ defmodule GOL.Facade do
   alias GOL.ShardedCellEventHandler
   alias GOL.ShardedNeighborhoodEventHandler
 
+  def empty_generation do
+    empty_generation 4
+  end
+
   def empty_generation total_shards do
     for i <- 0..total_shards-1, into: %{} do
       {:ok, manager} = GenEvent.start_link
@@ -16,10 +20,7 @@ defmodule GOL.Facade do
 
   def populate_alive_cell(generation, position) do
     # TODO: duplication of position.x
-    index = Map.keys(generation) |>
-            Enum.find(fn shard_index ->
-              ShardIndex.contains(shard_index, position.x)
-            end)
+    index = locate_shard(generation, position)
     CellShard.populate_alive_cell Map.get(generation, index), position
   end
 
@@ -28,6 +29,11 @@ defmodule GOL.Facade do
     Enum.flat_map(fn shard ->
       CellShard.alive shard
     end)
+  end
+
+  def alive(generation, position) do
+    index = locate_shard(generation, position)
+    Enum.member? (CellShard.alive Map.get(generation, index)), position
   end
 
   def evolve(generation) do
@@ -66,5 +72,12 @@ defmodule GOL.Facade do
   def each_shard(generation, target) do
     Map.values(generation) |>
     Enum.map(target)
+  end
+
+  defp locate_shard(generation, position) do
+    Map.keys(generation) |>
+    Enum.find(fn shard_index ->
+      ShardIndex.contains(shard_index, position.x)
+    end)
   end
 end
