@@ -1,5 +1,5 @@
 defmodule GOL.ShardIndex do
-  defstruct current: 0, total: 4
+  defstruct current: nil, total: nil
 
   def from(representation) do
     [current_string, total_string] = String.split(representation, "in")

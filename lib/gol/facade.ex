@@ -12,7 +12,7 @@ defmodule GOL.Facade do
   def empty_generation total_shards do
     for i <- 0..total_shards-1, into: %{} do
       {:ok, manager} = GenEvent.start_link
-      shard_index = ShardIndex.from "#{i}in4"
+      shard_index = ShardIndex.from "#{i}in#{total_shards}"
       {:ok, shard} = CellShard.start_link manager, 1, shard_index
       CellShard.declare_empty shard
       {shard_index, shard}

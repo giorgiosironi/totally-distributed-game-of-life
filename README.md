@@ -49,6 +49,7 @@ All GenEvent delivery between processes is asynchronous through notify/2, so wor
 Next steps:
 * garbage collection of old generations processes
 * introduce a supervision tree
+* shards should act both on rows and columns, not just on one dimension
 
 
 
