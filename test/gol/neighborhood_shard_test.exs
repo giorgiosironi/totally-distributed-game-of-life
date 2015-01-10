@@ -16,9 +16,9 @@ defmodule GOL.NeighborhoodShardTest do
   
   test "after the number of relevant neighborhood needed is known it can tell them to evolve" do
     {:ok, manager} = GenEvent.start_link
-    GenEvent.add_mon_handler(manager, Forwarder, self())
     own_shard = ShardIndex.from "0in4"
     {:ok, shard} = NeighborhoodShard.start_link manager, 2, own_shard
+    NeighborhoodShard.attach_event_handler shard, Forwarder, self()
 
     NeighborhoodShard.number_will_be shard, 2
     NeighborhoodShard.number_will_be shard, 0

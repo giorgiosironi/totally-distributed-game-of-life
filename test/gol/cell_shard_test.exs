@@ -15,7 +15,8 @@ defmodule GOL.CellShardTest do
 
   setup do
     {:ok, manager} = GenEvent.start_link
-    GenEvent.add_mon_handler(manager, Forwarder, self())
+    :ok = GenEvent.add_mon_handler(manager, Forwarder, self())
+    # TODO: extract here creation of own_shard_index and shard
 
     {:ok, manager: manager}
   end

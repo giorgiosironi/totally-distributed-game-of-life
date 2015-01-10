@@ -58,7 +58,7 @@ defmodule GOL.NeighborhoodShard do
   end
 
   def handle_call({:attach_event_handler, handler, handler_state}, _from, state) do
-    GenEvent.add_mon_handler(state.neighborhood_events, handler, handler_state)
+    :ok = GenEvent.add_mon_handler(state.neighborhood_events, handler, handler_state)
     {:reply, nil, state}
   end
 
