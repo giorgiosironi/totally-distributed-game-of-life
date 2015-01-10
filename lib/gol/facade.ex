@@ -10,9 +10,8 @@ defmodule GOL.Facade do
   end
 
   def empty_generation total_shards do
-    for i <- 0..total_shards-1, into: %{} do
+    for shard_index <- ShardIndex.all(total_shards), into: %{} do
       {:ok, manager} = GenEvent.start_link
-      shard_index = ShardIndex.from "#{i}in#{total_shards}"
       {:ok, shard} = CellShard.start_link manager, 1, shard_index
       CellShard.declare_empty shard
       {shard_index, shard}
@@ -37,12 +36,9 @@ defmodule GOL.Facade do
   end
 
   def evolve(generation) do
-
     total_shards = Enum.count generation
-    # TODO: cycle probably needs to be delegated to ShardIndex
-    neighborhood_shards = for i <- 0..total_shards-1 do
+    neighborhood_shards = for shard_index <- ShardIndex.all(total_shards) do
       {:ok, manager} = GenEvent.start_link
-      shard_index = ShardIndex.from "#{i}in#{total_shards}"
       {:ok, shard} = NeighborhoodShard.start_link manager, 2, shard_index
       for cell_shard <- Map.values(generation) do
         CellShard.attach_event_handler(

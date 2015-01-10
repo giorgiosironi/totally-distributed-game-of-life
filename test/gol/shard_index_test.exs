@@ -20,7 +20,17 @@ defmodule GOL.ShardIndexTest do
     assert "3in4" = String.Chars.to_string(ShardIndex.from "3in4")
   end
 
-  test "can generate a list of all shards" do
+  test "can generate a list of all shards from their number" do
+    all = [
+      ShardIndex.from("0in4"),
+      ShardIndex.from("1in4"),
+      ShardIndex.from("2in4"),
+      ShardIndex.from("3in4")
+    ] 
+    assert all == ShardIndex.all 4
+  end
+
+  test "can generate a list of all shards from one of them" do
     index = ShardIndex.from "2in4"
     all = [
       ShardIndex.from("0in4"),

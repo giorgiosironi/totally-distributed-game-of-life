@@ -1,5 +1,7 @@
 defmodule GOL.ShardIndex do
   alias GOL.Position
+  # to be able to use ShardIndex in pattern matching
+  alias __MODULE__
   defstruct current: nil, total: nil
 
   def from(representation) do
@@ -15,9 +17,13 @@ defmodule GOL.ShardIndex do
     rem(x, index.total) == index.current
   end
 
-  def all(index) do
-    for i <- 0..index.total-1 do
-      %GOL.ShardIndex{current: i, total: index.total}
+  def all(%ShardIndex{total: total}) do
+    all(total)
+  end
+
+  def all(total) do
+    for i <- 0..total-1 do
+      %GOL.ShardIndex{current: i, total: total}
     end
   end
 end
