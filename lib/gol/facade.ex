@@ -33,7 +33,7 @@ defmodule GOL.Facade do
 
   def alive(generation, position) do
     index = locate_shard(generation, position)
-    Enum.member? (CellShard.alive Map.get(generation, index)), position
+    CellShard.alive Map.get(generation, index), position
   end
 
   def evolve(generation) do

@@ -34,6 +34,10 @@ defmodule GOL.CellShard do
     GenServer.call(shard, {:alive})
   end
 
+  def alive(shard, position) do
+    GenServer.call(shard, {:alive, position})
+  end
+
   # TODO: docblocks
   def evolve(shard) do
     GenServer.call(shard, {:evolve})
@@ -60,6 +64,11 @@ defmodule GOL.CellShard do
       Cell.position c
     end
     {:reply, positions, state}
+  end
+
+  def handle_call({:alive, position}, _from, state) do
+    lifeness = Map.has_key? state.cells, position
+    {:reply, lifeness, state}
   end
 
   def handle_call({:evolve}, _from, state) do
