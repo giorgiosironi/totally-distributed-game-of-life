@@ -16,7 +16,7 @@ defmodule GOL.Cell do
 
   def neighborhood_needed_number(cell, shard) do
     Agent.get(cell, fn {position} -> 
-      Enum.count(neighborhoods_centers(position), fn center -> ShardIndex.contains(shard, center.x) end)
+      Enum.count(neighborhoods_centers(position), fn center -> ShardIndex.contains(shard, center) end)
     end)
   end
 
@@ -31,7 +31,7 @@ defmodule GOL.Cell do
   def neighborhoods(cell, shard, target) do
     Agent.get(cell, fn {position} ->
       Enum.filter(neighborhoods_centers(position), fn center ->
-        ShardIndex.contains(shard, center.x)
+        ShardIndex.contains(shard, center)
       end) |>
       Enum.each(fn center ->
         target.(center, position)

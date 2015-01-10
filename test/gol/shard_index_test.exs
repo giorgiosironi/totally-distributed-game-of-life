@@ -1,14 +1,15 @@
 defmodule GOL.ShardIndexTest do
   use ExUnit.Case
   alias GOL.ShardIndex
+  alias GOL.Position
 
   test "can calculate whether a number belongs to its shard" do
     index = ShardIndex.from "2in4"
-    assert ShardIndex.contains(index, 2)
-    assert ShardIndex.contains(index, 6)
-    assert false = ShardIndex.contains(index, 7)
-    assert false = ShardIndex.contains(index, 8)
-    assert false = ShardIndex.contains(index, 9)
+    assert ShardIndex.contains(index, Position.xy(2, 42))
+    assert ShardIndex.contains(index, Position.xy(6, 42))
+    assert false = ShardIndex.contains(index, Position.xy(7, 42))
+    assert false = ShardIndex.contains(index, Position.xy(8, 42))
+    assert false = ShardIndex.contains(index, Position.xy(9, 42))
   end
 
   test "index goes from 0 to the total number of shards, excluded" do

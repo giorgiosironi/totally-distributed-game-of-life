@@ -20,7 +20,6 @@ defmodule GOL.Facade do
   end
 
   def populate_alive_cell(generation, position) do
-    # TODO: duplication of position.x
     index = locate_shard(generation, position)
     CellShard.populate_alive_cell Map.get(generation, index), position
   end
@@ -80,7 +79,7 @@ defmodule GOL.Facade do
   defp locate_shard(generation, position) do
     Map.keys(generation) |>
     Enum.find(fn shard_index ->
-      ShardIndex.contains(shard_index, position.x)
+      ShardIndex.contains(shard_index, position)
     end)
   end
 end

@@ -1,4 +1,5 @@
 defmodule GOL.ShardIndex do
+  alias GOL.Position
   defstruct current: nil, total: nil
 
   def from(representation) do
@@ -10,8 +11,8 @@ defmodule GOL.ShardIndex do
     %GOL.ShardIndex{current: current, total: total}
   end
 
-  def contains(index, number) do
-    rem(number, index.total) == index.current
+  def contains(index, %Position{x: x}) do
+    rem(x, index.total) == index.current
   end
 
   def all(index) do
