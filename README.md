@@ -3,6 +3,13 @@ Totally distribut(able) Game Of Life
 
 The [Game Of Life](http://en.wikipedia.org/wiki/Conway%27s_Game_of_Life) is a zero-player game where the initial state of an infinite plane evolves in discrete steps giving birth to interesting patterns.
 
+## How to run
+
+    iex -S mix run scripts/bar.exs
+    iex -S mix run scripts/random.exs
+
+Stop the evolution with `Ctrl-C` followed by `a`.
+
 ## Design
 
 I am attempting to use Elixir and the Erlang Virtual Machine to parallelize and distribute the computation, initially over multiple cores of the same machine:
@@ -42,6 +49,7 @@ All events and wiring is already in place and working, as shown in `test/gol_tes
 Next steps:
 * display a generation on the terminal
 * build synchronization primitives on Facade and CellShard to wait for a generaton to be completed before displaying
+* garbage collection of old generations processes
 * parallelize tasks, how do we profile this?
 * introduce a supervision tree
 * attempt asynchronous delivery of events (GenEvent.notify), and see how can we introduce at-least-once delivery to deal with failures
