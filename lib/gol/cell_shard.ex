@@ -3,6 +3,10 @@ defmodule GOL.CellShard do
   alias GOL.Cell
   alias GOL.ShardIndex
 
+  @doc """
+  Creates a new shard for the `generation`-th generation. 
+  TODO: @spec annotations
+  """
   def start_link(cell_events, generation, shard_index, args \\ []) do
     GenServer.start_link(
       __MODULE__, 
