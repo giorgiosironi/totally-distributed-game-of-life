@@ -70,11 +70,11 @@ defmodule GOL.NeighborhoodShard do
     if state.shard_index.total == Enum.count(state.totals_neighborhoods)
     && Enum.reduce(state.totals_neighborhoods, fn a, b -> a + b end) == state.total_neighborhoods_needed_received do
       # TODO: total_neighborhoods_needed_received is incorrect, we should use the number of neighborhoods. Add a relevant test
-      GenEvent.sync_notify state.neighborhood_events, {:cells_considered, state.shard_index, Enum.count(state.neighborhoods)}
+      GenEvent.notify state.neighborhood_events, {:cells_considered, state.shard_index, Enum.count(state.neighborhoods)}
       Map.values(state.neighborhoods) |>
       Enum.each(fn neighborhood ->
         Neighborhood.to_new_cell neighborhood, fn center, life -> 
-          GenEvent.sync_notify state.neighborhood_events, {:cell, state.shard_index, center, life} 
+          GenEvent.notify state.neighborhood_events, {:cell, state.shard_index, center, life} 
         end
       end)
     end

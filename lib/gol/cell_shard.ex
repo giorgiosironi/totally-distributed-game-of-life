@@ -149,7 +149,7 @@ defmodule GOL.CellShard do
   end
 
   defp emit_event(state, event) do
-    GenEvent.sync_notify state.cell_events, event
+    GenEvent.notify state.cell_events, event
   end
 
   defp spawn_alive_cell(state, position) do
