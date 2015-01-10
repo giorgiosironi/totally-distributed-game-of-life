@@ -44,13 +44,11 @@ and `number` events:
 
 All events and wiring is already in place and working, as shown in `test/gol_test.exs`.
 
-**Right now** event delivery between processes is synchronous, so there is no parallelization taking place.
+All GenEvent delivery between processes is asynchronous through notify/2, so work is parallelized over 4 beam.smp OS processes. Since all processes are linked, any failure will cause the termination of the simulation for now (which is at least better than silently ignoring them or lose events.)
 
 Next steps:
 * garbage collection of old generations processes
-* parallelize tasks, how do we profile this?
 * introduce a supervision tree
-* attempt asynchronous delivery of events (GenEvent.notify), and see how can we introduce at-least-once delivery to deal with failures
 
 
 
