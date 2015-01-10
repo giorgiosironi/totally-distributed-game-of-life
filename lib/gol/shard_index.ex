@@ -20,3 +20,9 @@ defmodule GOL.ShardIndex do
     end
   end
 end
+
+defimpl String.Chars, for: GOL.ShardIndex do
+  def to_string(index) do
+    "#{index.current}in#{index.total}"
+  end
+end
