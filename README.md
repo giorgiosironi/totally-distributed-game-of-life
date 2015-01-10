@@ -47,7 +47,6 @@ All events and wiring is already in place and working, as shown in `test/gol_tes
 **Right now** event delivery between processes is synchronous, so there is no parallelization taking place.
 
 Next steps:
-* display a generation on the terminal
 * build synchronization primitives on Facade and CellShard to wait for a generaton to be completed before displaying
 * garbage collection of old generations processes
 * parallelize tasks, how do we profile this?
